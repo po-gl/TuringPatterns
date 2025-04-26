@@ -138,7 +138,7 @@ function draw() {
   for (let x = 0; x < width; x++) {
     for (let y = 0; y < height; y++) {
       let p = (x + y * width) * 4;
-      let c = lookupLUT(paletteLUT, next[x][y].b);
+      let c = lookupLUT(paletteLUT, next[x][y].b + (y / height) * 0.12);
       pixels[p + 0] = c.r;
       pixels[p + 1] = c.g;
       pixels[p + 2] = c.b;

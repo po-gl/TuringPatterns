@@ -23,26 +23,42 @@ let mouseRadius = 16;
 let mouseMoved = false;
 let mouseMovedDebounce;
 
+let simUpdateHandle;
+
 let grid;
 let next;
 let paletteLUT;
 let font;
 
-function preload() {
-  font = loadFont("assets/Gallient.otf");
-}
-
 function setup() {
-  let cnv = createCanvas(500, 500);
+  let cnv = createCanvas(windowWidth, windowHeight);
   pixelDensity(1);
   cnv.mouseWheel(changeMouseRadius);
   textFont(font);
   textSize(12);
   paletteLUT = generatePalette(255);
 
+  initSim();
+}
+
+function windowResized() {
+  noLoop();
+  stopSim();
+  resizeCanvas(windowWidth, windowHeight);
+  resizeGrids();
+  loop();
+  startSim();
+}
+
+function preload() {
+  font = loadFont("assets/Gallient.otf");
+}
+
+function initSim() {
   grid = newGrid();
   next = newGrid();
   seedChemical();
+  startSim();
 }
 
 function addChemical(x, y, size) {
@@ -83,6 +99,21 @@ function swapGrids() {
   var temp = grid;
   grid = next;
   next = temp;
+}
+
+function resizeGrids() {
+  const resizedGrid = newGrid();
+  const resizedNext = newGrid();
+  const minWidth = min(grid.length, width);
+  const minHeight = min(grid[0].length, height);
+  for (let x = 0; x < minWidth; x++) {
+    for (let y = 0; y < minHeight; y++) {
+      resizedGrid[x][y] = grid[x][y];
+      resizedNext[x][y] = next[x][y];
+    }
+  }
+  grid = resizedGrid;
+  next = resizedNext;
 }
 
 // Use kernels for this?
@@ -152,6 +183,7 @@ function triggerMouseMoved() {
 }
 
 function draw() {
+  if (!isLooping()) return;
   background(50);
   loadPixels();
   for (let x = 0; x < width; x++) {
@@ -176,6 +208,7 @@ function draw() {
 }
 
 function simUpdate() {
+  if (!isLooping()) return;
   if (mouseIsPressed) {
     addChemical(mouseX, mouseY, mouseRadius * 0.6);
   }
@@ -192,4 +225,11 @@ function simUpdate() {
   }
 }
 
-setInterval(simUpdate, 0);
+function stopSim() {
+  clearTimeout(simUpdateHandle);
+}
+
+function startSim() {
+  stopSim();
+  simUpdateHandle = setInterval(simUpdate, 0);
+}

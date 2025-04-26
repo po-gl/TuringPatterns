@@ -20,6 +20,8 @@ let dB = 0.5;
 let ratesA = { feed: 0.055, kill: 0.062 };
 let ratesB = { feed: 0.0367, kill: 0.0649 };
 
+let paletteLUT;
+
 let mouseRadius = 16;
 let mouseMoved = false;
 let mouseMovedDebounce;
@@ -28,6 +30,7 @@ function setup() {
   let cnv = createCanvas(500, 500);
   pixelDensity(1);
   cnv.mouseWheel(changeMouseRadius);
+  paletteLUT = generatePalette(255);
 
   grid = newGrid();
   next = newGrid();
@@ -146,9 +149,10 @@ function draw() {
   for (let x = 0; x < width; x++) {
     for (let y = 0; y < height; y++) {
       let p = (x + y * width) * 4;
-      pixels[p + 0] = floor(next[x][y].a * 255);
-      pixels[p + 1] = 0;
-      pixels[p + 2] = floor(next[x][y].b * 255);
+      let c = lookupLUT(paletteLUT, next[x][y].b);
+      pixels[p + 0] = c.r;
+      pixels[p + 1] = c.g;
+      pixels[p + 2] = c.b;
       pixels[p + 3] = 255;
     }
   }

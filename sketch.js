@@ -2,10 +2,10 @@
  * Basically, I'll be implementing the Reaction-Diffusion simulation
  * using the Gray-Scott model like in this video:
  * https://www.youtube.com/watch?v=BV9ny785UNc
- * 
+ *
  * Which is using this excellent tutorial by Karl Sims:
  * https://karlsims.com/rd.html
- * 
+ *
  * - simulating a chemaical reaction
  * - applying a convolution (kernel loop practice)
  * - 2D Laplacian functions
@@ -15,23 +15,35 @@
 let grid;
 let next;
 
-let dA = 1.0
+let dA = 1.0;
 let dB = 0.5;
 let feed = 0.055;
 let kill = 0.062;
 // let feed = 0.0367;
 // let kill = 0.0649;
 
+let mouseRadius = 16;
+let mouseMoved = false;
+let mouseMovedDebounce;
+
 function setup() {
-  createCanvas(400, 400);
+  let cnv = createCanvas(500, 500);
   pixelDensity(1);
   grid = newGrid();
   next = newGrid();
 
+  cnv.mouseWheel(changeMouseRadius);
+
   // seed chemical
-  for (let i = width / 2 - 20; i < width / 2 + 20; i++) {
-    for (let j = height / 2 - 20; j < height / 2 + 20; j++) {
-      grid[i][j].b = 1
+  addChemical(width / 2, height / 2, 50);
+}
+
+function addChemical(x, y, size) {
+  let hSize = floor(size / 2);
+  for (let i = x - hSize; i < x + hSize; i++) {
+    for (let j = y - hSize; j < y + hSize; j++) {
+      grid[i][j].b = 1;
+      grid[i][j].a = 0;
     }
   }
 }
@@ -44,7 +56,7 @@ function newGrid() {
       g[x][y] = { a: 1, b: 0 };
     }
   }
-  return g
+  return g;
 }
 
 function swapGrids() {
@@ -56,7 +68,7 @@ function swapGrids() {
 // Use kernels for this?
 function laplaceA(x, y) {
   var res = 0;
-  var adj = 0.2
+  var adj = 0.2;
   var diag = 0.05;
   // convolution
   res += grid[x][y].a * -1;
@@ -68,12 +80,12 @@ function laplaceA(x, y) {
   res += grid[x + 1][y - 1].a * diag;
   res += grid[x + 1][y + 1].a * diag;
   res += grid[x - 1][y + 1].a * diag;
-  return res
+  return res;
 }
 
 function laplaceB(x, y) {
   var res = 0;
-  var adj = 0.2
+  var adj = 0.2;
   var diag = 0.05;
   res += grid[x][y].b * -1;
   res += grid[x - 1][y].b * adj;
@@ -84,7 +96,39 @@ function laplaceB(x, y) {
   res += grid[x + 1][y - 1].b * diag;
   res += grid[x + 1][y + 1].b * diag;
   res += grid[x - 1][y + 1].b * diag;
-  return res
+  return res;
+}
+
+function mouseUpdate() {
+  if (movedX === 0 && movedY === 0 && !mouseMoved) return;
+  noFill();
+  noStroke();
+  stroke(0, 0, 0, 160);
+  strokeWeight(2);
+  circle(mouseX, mouseY, mouseRadius);
+
+  if (movedX !== 0 || movedY !== 0) {
+    triggerMouseMoved();
+  }
+}
+
+function changeMouseRadius(event) {
+  if (event.deltaY > 0) {
+    mouseRadius += 1;
+    mouseRadius = min(mouseRadius, 100);
+  } else if (event.deltaY < 0) {
+    mouseRadius -= 1;
+    mouseRadius = max(mouseRadius, 8);
+  }
+  triggerMouseMoved();
+}
+
+function triggerMouseMoved() {
+  mouseMoved = true;
+  clearTimeout(mouseMovedDebounce);
+  mouseMovedDebounce = setTimeout(() => {
+    mouseMoved = false;
+  }, 700);
 }
 
 function draw() {
@@ -100,19 +144,22 @@ function draw() {
     }
   }
   updatePixels();
+  mouseUpdate();
   swapGrids();
 }
 
-function update() {
-  var t = 1.0;
+function simUpdate() {
+  if (mouseIsPressed) {
+    addChemical(mouseX, mouseY, mouseRadius * 0.6);
+  }
   for (let x = 1; x < width - 1; x++) {
     for (let y = 1; y < height - 1; y++) {
       let a = grid[x][y].a;
       let b = grid[x][y].b;
-      next[x][y].a = a + (dA * laplaceA(x, y) - a * b * b + feed * (1 - a)) * t;
-      next[x][y].b = b + (dB * laplaceB(x, y) + a * b * b - (kill + feed) * b) * t;
+      next[x][y].a = a + (dA * laplaceA(x, y) - a * b * b + feed * (1 - a));
+      next[x][y].b = b + (dB * laplaceB(x, y) + a * b * b - (kill + feed) * b);
     }
   }
 }
 
-setInterval(update, 0)
+setInterval(simUpdate, 0);

@@ -27,13 +27,11 @@ let mouseMovedDebounce;
 function setup() {
   let cnv = createCanvas(500, 500);
   pixelDensity(1);
-  grid = newGrid();
-  next = newGrid();
-
   cnv.mouseWheel(changeMouseRadius);
 
-  // seed chemical
-  addChemical(width / 2, height / 2, 50);
+  grid = newGrid();
+  next = newGrid();
+  seedChemical();
 }
 
 function addChemical(x, y, size) {
@@ -42,6 +40,19 @@ function addChemical(x, y, size) {
     for (let j = y - hSize; j < y + hSize; j++) {
       grid[i][j].b = 1;
       grid[i][j].a = 0;
+    }
+  }
+}
+
+function seedChemical() {
+  let threshold = 0.55;
+  let scale = 0.04;
+  for (let x = 0; x < width; x++) {
+    for (let y = 0; y < height; y++) {
+      if (noise(x * scale, y * scale) > threshold) {
+        grid[x][y].b = 1;
+        grid[x][y].a = 0;
+      }
     }
   }
 }

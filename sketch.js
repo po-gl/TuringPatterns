@@ -84,38 +84,6 @@ function seedChemical() {
   }
 }
 
-function newGrid() {
-  g = [];
-  for (let x = 0; x < width; x++) {
-    g[x] = [];
-    for (let y = 0; y < height; y++) {
-      g[x][y] = { a: 1, b: 0 };
-    }
-  }
-  return g;
-}
-
-function swapGrids() {
-  var temp = grid;
-  grid = next;
-  next = temp;
-}
-
-function resizeGrids() {
-  const resizedGrid = newGrid();
-  const resizedNext = newGrid();
-  const minWidth = min(grid.length, width);
-  const minHeight = min(grid[0].length, height);
-  for (let x = 0; x < minWidth; x++) {
-    for (let y = 0; y < minHeight; y++) {
-      resizedGrid[x][y] = grid[x][y];
-      resizedNext[x][y] = next[x][y];
-    }
-  }
-  grid = resizedGrid;
-  next = resizedNext;
-}
-
 // Use kernels for this?
 function laplaceA(x, y) {
   var res = 0;
@@ -163,25 +131,6 @@ function mouseUpdate() {
   }
 }
 
-function changeMouseRadius(event) {
-  if (event.deltaY > 0) {
-    mouseRadius += 1;
-    mouseRadius = min(mouseRadius, 100);
-  } else if (event.deltaY < 0) {
-    mouseRadius -= 1;
-    mouseRadius = max(mouseRadius, 8);
-  }
-  triggerMouseMoved();
-}
-
-function triggerMouseMoved() {
-  mouseMoved = true;
-  clearTimeout(mouseMovedDebounce);
-  mouseMovedDebounce = setTimeout(() => {
-    mouseMoved = false;
-  }, 700);
-}
-
 function draw() {
   if (!isLooping()) return;
   background(50);
@@ -223,13 +172,4 @@ function simUpdate() {
       next[x][y].b = b + (dB * laplaceB(x, y) + a * b * b - (k + f) * b);
     }
   }
-}
-
-function stopSim() {
-  clearTimeout(simUpdateHandle);
-}
-
-function startSim() {
-  stopSim();
-  simUpdateHandle = setInterval(simUpdate, 0);
 }

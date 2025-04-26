@@ -17,10 +17,8 @@ let next;
 
 let dA = 1.0;
 let dB = 0.5;
-let feed = 0.055;
-let kill = 0.062;
-// let feed = 0.0367;
-// let kill = 0.0649;
+let ratesA = { feed: 0.055, kill: 0.062 };
+let ratesB = { feed: 0.0367, kill: 0.0649 };
 
 let mouseRadius = 16;
 let mouseMoved = false;
@@ -156,8 +154,11 @@ function simUpdate() {
     for (let y = 1; y < height - 1; y++) {
       let a = grid[x][y].a;
       let b = grid[x][y].b;
-      next[x][y].a = a + (dA * laplaceA(x, y) - a * b * b + feed * (1 - a));
-      next[x][y].b = b + (dB * laplaceB(x, y) + a * b * b - (kill + feed) * b);
+      // modified rates
+      let f = lerp(ratesA.feed, ratesB.feed, y / height);
+      let k = lerp(ratesA.kill, ratesB.kill, y / height);
+      next[x][y].a = a + (dA * laplaceA(x, y) - a * b * b + f * (1 - a));
+      next[x][y].b = b + (dB * laplaceB(x, y) + a * b * b - (k + f) * b);
     }
   }
 }

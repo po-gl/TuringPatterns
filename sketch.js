@@ -12,19 +12,20 @@
  * - in javascript lol ~ later I'll do a shader
  */
 
-let grid;
-let next;
+const debug = false;
 
-let dA = 1.0;
-let dB = 0.5;
-let ratesA = { feed: 0.055, kill: 0.062 };
-let ratesB = { feed: 0.0367, kill: 0.0649 };
-
-let paletteLUT;
+const dA = 1.0;
+const dB = 0.5;
+const ratesA = { feed: 0.055, kill: 0.062 };
+const ratesB = { feed: 0.0367, kill: 0.0649 };
 
 let mouseRadius = 16;
 let mouseMoved = false;
 let mouseMovedDebounce;
+
+let grid;
+let next;
+let paletteLUT;
 
 function setup() {
   let cnv = createCanvas(500, 500);
@@ -158,6 +159,9 @@ function draw() {
   }
   updatePixels();
   mouseUpdate();
+  if (debug) {
+    text(`fps: ${(1000 / deltaTime).toFixed(2)}`, width - 60, height - 10);
+  }
   swapGrids();
 }
 

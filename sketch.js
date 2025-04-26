@@ -26,11 +26,18 @@ let mouseMovedDebounce;
 let grid;
 let next;
 let paletteLUT;
+let font;
+
+function preload() {
+  font = loadFont("assets/Gallient.otf");
+}
 
 function setup() {
   let cnv = createCanvas(500, 500);
   pixelDensity(1);
   cnv.mouseWheel(changeMouseRadius);
+  textFont(font);
+  textSize(12);
   paletteLUT = generatePalette(255);
 
   grid = newGrid();
@@ -160,7 +167,10 @@ function draw() {
   updatePixels();
   mouseUpdate();
   if (debug) {
-    text(`fps: ${(1000 / deltaTime).toFixed(2)}`, width - 60, height - 10);
+    stroke("black");
+    fill("black");
+    strokeWeight(0.8);
+    text(`FPS: ${(1000 / deltaTime).toFixed(2)}`, width - 60, height - 10);
   }
   swapGrids();
 }

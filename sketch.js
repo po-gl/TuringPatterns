@@ -10,14 +10,41 @@
  * - applying a convolution (kernel loop practice)
  * - 2D Laplacian functions
  * - in javascript lol ~ later I'll do a shader
+ *
+ * Really cool map of parameters: https://mrob.com/pub/comp/xmorphia/
+ * with associated page: https://mrob.com/pub/comp/xmorphia/uskate-world.html
+ * which is basically a taxonomy of different pattern behaviors
+ *
+ * The interesting reactions are actually in a pretty narrow band of parameters
  */
 
 const debug = false;
 
 const dA = 1.0;
 const dB = 0.5;
-const ratesA = { feed: 0.055, kill: 0.062 };
-const ratesB = { feed: 0.0367, kill: 0.0649 };
+const rates = [
+  {
+    name: "Classic",
+    feed: 0.055,
+    kill: 0.062,
+  },
+  {
+    name: "Mitosis",
+    feed: 0.0367,
+    kill: 0.0649,
+  },
+  {
+    name: "Blobby",
+    feed: 0.094,
+    kill: 0.057,
+  },
+  {
+    name: "Shapeish",
+    feed: 0.07,
+    kill: 0.061,
+  },
+];
+let selectedRate;
 
 let mouseRadius = 16;
 let mouseMoved = false;
@@ -38,6 +65,10 @@ function setup() {
   textSize(12);
   paletteLUT = generatePalette(255);
 
+  selectedRates = {
+    a: rates.find((r) => r.name === "Classic"),
+    b: rates.find((r) => r.name === "Mitosis"),
+  };
   initSim();
 }
 
@@ -169,8 +200,8 @@ function simUpdate() {
       let a = grid[x][y].a;
       let b = grid[x][y].b;
       // modified rates
-      let f = lerp(ratesA.feed, ratesB.feed, y / height);
-      let k = lerp(ratesA.kill, ratesB.kill, y / height);
+      let f = lerp(selectedRates.a.feed, selectedRates.b.feed, y / height);
+      let k = lerp(selectedRates.a.kill, selectedRates.b.kill, y / height);
       next[x][y].a = a + (dA * laplaceA(x, y) - a * b * b + f * (1 - a));
       next[x][y].b = b + (dB * laplaceB(x, y) + a * b * b - (k + f) * b);
     }

@@ -72,10 +72,13 @@ function addChemical(x, y, size) {
 }
 
 function seedChemical() {
-  let threshold = 0.55;
-  let scale = 0.04;
-  for (let x = 0; x < width; x++) {
-    for (let y = 0; y < height; y++) {
+  const threshold = 0.55;
+  const scale = 0.04;
+  const size = height / 2;
+  const hSize = floor(size / 2);
+  const center = { x: floor(width / 2), y: floor(height / 2) };
+  for (let x = center.x - hSize; x < center.x + hSize; x++) {
+    for (let y = center.y - hSize; y < center.y + hSize; y++) {
       if (noise(x * scale, y * scale) > threshold) {
         grid[x][y].b = 1;
         grid[x][y].a = 0;

@@ -44,7 +44,7 @@ const rates = [
     kill: 0.061,
   },
 ];
-let selectedRate;
+let selectedRates;
 let lerpRatio;
 
 let mouseRadius = 16;

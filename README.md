@@ -1,0 +1,3 @@
+A quick turing patterns p5 visualization.
+
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/7dbc03b6-7e5e-4f65-8acc-f52e072e1c41" />

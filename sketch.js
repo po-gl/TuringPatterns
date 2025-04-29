@@ -45,6 +45,7 @@ const rates = [
   },
 ];
 let selectedRate;
+let lerpRatio;
 
 let mouseRadius = 16;
 let mouseMoved = false;
@@ -67,8 +68,9 @@ function setup() {
 
   selectedRates = {
     a: rates.find((r) => r.name === "Classic"),
-    b: rates.find((r) => r.name === "Mitosis"),
+    b: rates.find((r) => r.name === "Blobby"),
   };
+  lerpRatio = 0.55;
   initSim();
 }
 
@@ -200,8 +202,16 @@ function simUpdate() {
       let a = grid[x][y].a;
       let b = grid[x][y].b;
       // modified rates
-      let f = lerp(selectedRates.a.feed, selectedRates.b.feed, y / height);
-      let k = lerp(selectedRates.a.kill, selectedRates.b.kill, y / height);
+      let f = lerp(
+        selectedRates.a.feed,
+        selectedRates.b.feed,
+        (y / height) * lerpRatio
+      );
+      let k = lerp(
+        selectedRates.a.kill,
+        selectedRates.b.kill,
+        (y / height) * lerpRatio
+      );
       next[x][y].a = a + (dA * laplaceA(x, y) - a * b * b + f * (1 - a));
       next[x][y].b = b + (dB * laplaceB(x, y) + a * b * b - (k + f) * b);
     }

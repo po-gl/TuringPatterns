@@ -2,7 +2,7 @@ function generatePalette(
   size,
   a = [0.458, 0.288, 0.288], // offset
   b = [0.328, 0.208, 0.268], // amplitude
-  c = [1.8, 1.8, 1.8], // frequency
+  c = [2.0, 2.0, 2.0], // frequency
   d = [1.468, 0.788, 0.958] // phase shift
 ) {
   const lut = [];
@@ -23,7 +23,7 @@ function generatePalette(
 }
 
 function lookupLUT(lut, t) {
-  return lut[Math.floor((lut.length - 1) * t + frameCount * 0.2) % lut.length];
+  return lut[Math.floor((lut.length - 1) * t + frameCount * 0.18) % lut.length];
 }
 
 function stopSim() {
